@@ -1,247 +1,121 @@
 from selenium import webdriver
-from bs4 import BeautifulSoup as bs
-import time
-import os, sys
-import pandas as pd
-import openpyxl
-import random
-import re
-import requests
-import pyperclip
-
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
-from bs4 import BeautifulSoup as bs
 from selenium.webdriver.support.ui import Select
+from selenium.webdriver.chrome.options import Options
+import time
 
+###############################################################
+########## 페이지(1) : webdriver 구동 및 홈페이지 접속 #########
+###############################################################
 
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-#from selenium.common.exceptions import NoSuchElementException
+student = {'school' : '늘봄초', 'name' : '하지훈', 'sinNum' : '111117', 'secNum' : '8080'}
 
-from selenium.common.exceptions import TimeoutException, NoSuchElementException, NoAlertPresentException,\
-     UnexpectedAlertPresentException
+# webdriver 옵션 설정 : 화면 최대사이즈, 자동제어 메시지 나타나지 않게 설정
+opt = Options()
+opt.add_argument('--start-maximized')
+opt.add_experimental_option("excludeSwitches", ["enable-automation"])
+opt.add_experimental_option('useAutomationExtension', False)
 
-from webdriver_manager.chrome import ChromeDriverManager
-
-
-def log_in(driver):                      
-    #url = 'https://blog.naver.com/bizinfo1357'
-    url = 'https://hcs.eduro.go.kr/#/loginHome'
-
-    driver.implicitly_wait(1)
-    
-    driver.get(url)
-    driver.implicitly_wait(1)
- 
-    return driver
-
-def save_html (driver, filename):
-    soup_html = bs(driver.page_source, 'html.parser')
-
-    with open(filename, "w", encoding='utf-8') as file:
-        file.write(str(soup_html))
-
-
-    
-                           
-    
-#if __name__ ==  "__main__" :
-
-#driver = webdriver.Chrome(ChromeDriverManager().install())
-driver = webdriver.Chrome("C:\chromedriver\chromedriver.exe")
-
-print("try to login...")
-
+# webdriver를 통한 크롬 구동
+driver = webdriver.Chrome("C:\chromedriver\chromedriver.exe", options=opt)
 driver.get('https://hcs.eduro.go.kr/#/loginHome')
-time.sleep(1)
-
-
-# 로그인 버튼을 찾고 클릭합니다
-
-btn = driver.find_element_by_id('btnConfirm2')
-btn.click()
 time.sleep(3)
 
+# '자가진단참여하기' 자동 선택(기본으로 초중고 선택되어 있음)
+ele = driver.find_element_by_id('btnConfirm2')
+ele.click()
+time.sleep(3)
 
-btn =  driver.find_element_by_id('schul_name_input')
-btn.click()
-time.sleep(1)
+###############################################################
+####### 페이지(2) : 학교 정보 입력 ############################ 
+###############################################################
 
-obj1 = Select(driver.find_element_by_id("sidolabel"))
-obj1.select_by_index(8)
-time.sleep(1)
-
-obj1 = Select(driver.find_element_by_id("crseScCode"))
-obj1.select_by_index(2)
-btn =  driver.find_element_by_id('orgname')
-btn.send_keys("늘봄초")
-
-xpath = '//*[@id="softBoardListLayer"]/div[2]/div[1]/table/tbody/tr[3]/td[2]/button'
-btn =  driver.find_element_by_xpath(xpath)
-btn.click()
-time.sleep(1)
-
-
-xpath = '//*[@id="softBoardListLayer"]/div[2]/div[1]/ul/li/a/p/a'
-btn =  driver.find_element_by_xpath(xpath)
-btn.click()
-time.sleep(1)
-
-xpath = '//*[@id="softBoardListLayer"]/div[2]/div[2]/input'
-btn =  driver.find_element_by_xpath(xpath)
-btn.click()
-
-btn =  driver.find_element_by_id('user_name_input')
-btn.send_keys("하지훈")
-
-btn =  driver.find_element_by_id('birthday_input')
-btn.send_keys("111117")
-btn =  driver.find_element_by_id('btnConfirm')
-btn.click()
+# 학교 검색
+ele =  driver.find_element_by_id('schul_name_input')  
+ele.click()
 time.sleep(2)
 
-#xpath = '//*[@id="WriteInfoForm"]/table/tbody/tr/td/input'
-#btn =  driver.find_element_by_xpath(xpath)
-#btn.send_keys('8080')
+# 시/도 선택 :: 'Select'를 활용한 드롭다운 메뉴 선택 
+ele = Select(driver.find_element_by_id("sidolabel"))   
+ele.select_by_index(8)
 
-class_key_img = driver.find_element_by_class_name("keyboard-img")
-class_key_img.click()
+# 학교명 검색 :: 'Select'를 활용한 드롭다운 메뉴 선택 
+ele = Select(driver.find_element_by_id("crseScCode"))
+ele.select_by_index(2)
+
+# 학교명 입력
+ele = driver.find_element_by_id('orgname')
+ele.send_keys(student["school"])
+
+ele = driver.find_element_by_class_name("searchBtn")
+ele.click()
+time.sleep(1)
+
+# 학교명 선택(처음에는 나타나지 않음)
+ele = driver.find_element_by_tag_name("em")
+ele.click()
+time.sleep(1)
+
+# 학교선택 정보 최종 제출
+ele = driver.find_element_by_class_name("layerFullBtn")
+ele.click()
 time.sleep(2)
 
-num8 = "#password_mainDiv > div:nth-child(8) > a:nth-child(4)"
-num8_ele = driver.find_element_by_css_selector(num8)
 
-num0 = "#password_mainDiv > div:nth-child(4) > a"
-num0_ele = driver.find_element_by_css_selector(num0)
+###############################################################
+############# 페이지(2) : 학생 정보 입력 ######################
+###############################################################
 
-num_list = [num8_ele, num0_ele, num8_ele, num0_ele]
-for num in num_list:
-    num.click()
+ele = driver.find_element_by_id('user_name_input')
+ele.send_keys(student["name"])
+
+ele = driver.find_element_by_id('birthday_input')
+ele.send_keys(student["sinNum"])
+
+ele = driver.find_element_by_id('btnConfirm')
+ele.click()
+time.sleep(1)
+
+
+###############################################################
+############## 페이지(2) : 비밀번호 자동 클릭 설정 #############
+###############################################################
+
+# 비밀번호 입력 버튼 클릭
+ele = driver.find_element_by_class_name("keyboard-img")
+ele.click()
+time.sleep(2)
+
+# a 태그들 중 'aria-label' 속성값이 비밀번호랑 일치하는 것을 찾아 클릭
+numPadEles = driver.find_elements_by_tag_name("a")
+for i in range(len(student["secNum"])):
+    for j in range(len(numPadEles)):
+        if student["secNum"][i] == numPadEles[j].get_attribute("aria-label"):
+            numPadEles[j].click()            
+            time.sleep(0.5)
+ele =  driver.find_element_by_id('btnConfirm')
+ele.click()
+time.sleep(2)
+
+# 설문조사 버튼 클릭
+ele = driver.find_element_by_class_name("survey-button.active")  # class name space => . 
+ele.click()
+time.sleep(2)
+
+
+###############################################################
+############### 페이지(3): 설문조사 기본 응답 후 제출 ##########
+###############################################################
+
+self_test_id = ['survey_q1a1', 'survey_q2a3', 'survey_q3a1', 'btnConfirm']
+
+for i in range(len(self_test_id)):
+    if i == len(self_test_id) -1 :
+        last = input("마지막 단계 진행 할까요? (y/n)")
+        if last == 'n' or last == 'N':
+            break
+
+    ele = driver.find_element_by_id(self_test_id[i])
+    ele.click()
     time.sleep(1)
 
-#btn =  driver.find_element_by_id('tk_enter_r') 
-#btn.click()
-
-btn =  driver.find_element_by_id('btnConfirm')
-btn.click()
-
-
-"""
-
-print("td, pw 입력할 곳을 찾습니다...")
-# id, pw 입력할 곳을 찾습니다.
-tag_id = driver.find_element_by_name('id')
-tag_pw = driver.find_element_by_name('pw')
-tag_id.clear()
-time.sleep(1)
-
-# id 입력
-tag_id.click()
-pyperclip.copy('cbmss1357')
-tag_id.send_keys(Keys.CONTROL, 'v')
-time.sleep(1)
-
-# pw 입력
-tag_pw.click()
-pyperclip.copy('cbmss1357!')
-tag_pw.send_keys(Keys.CONTROL, 'v')
-time.sleep(1)
-
-# 로그인 버튼을 클릭합니다
-login_btn = driver.find_element_by_id('log.login')
-login_btn.click()
-
-time.sleep(1)
-
-
-driver.get('https://nid.naver.com/nidlogin.login')
-driver.find_element_by_name('id').send_keys('ovclid')
-driver.find_element_by_name('pw').send_keys('*sang716901')
-driver.find_element_by_xpath('//*[@id="frmNIDLogin"]/fieldset/input').click()
-
-
-driver = log_in(driver)
-
-soup_html = bs(driver.page_source, 'html.parser')
-
-subs = soup_html.findAll(class_="p_photo_d")
-
-for i in range(5):  #len(subs)
-    
-    sub_url = subs[i].find("a")["href"]
-    driver.get(sub_url)
-
-    driver.find_element_by_class_name('_spi_blog').click()  # spi_btn_blog
-    time.sleep(0.5)
-
-    handles = driver.window_handles
-    driver.switch_to.window(handles[1])
-    
-    driver.find_element_by_id('_submit').click()  # spi_btn_blog
-    time.sleep(0.5)
-    driver.switch_to.window(handles[0])
-        
-    #driver.find_element_by_class_name('pop_btn')
-    
-save_html(driver, f"blog.html")
-    
-
-try:
-    handles = driver.window_handles
-    driver.switch_to.window(handles[0])
-
-    search = '//*[@id="contents"]/div[2]/section/div[2]/div[3]/span/a/img'
-    driver.find_element_by_xpath(search).click()
-    driver.implicitly_wait(5)
-
-    handles = driver.window_handles
-    bizInfoListPopupHandleIndex= len(handles) - 1 # PopUP 창이 뜨지 않을 경우 1로 변경해야
-    driver.switch_to.window(handles[bizInfoListPopupHandleIndex])
-    
-    result_cominfo = '//*[@id="mySheet"]/tbody/tr[3]/td/div/div[1]/table/tbody/tr[2]/td[5]'
-    v
-    driver.find_element_by_xpath(result_cominfo).click()            
-    
-
-
-    #first_filename = input("!!!! 1차 파업 저장 파일 이름: ")
-    #save_html(driver, f"{first_filename}.html")
-
-    soup_html = bs(driver.page_source, 'html.parser')
-
-    save_html(driver, f"blog.html")
-    
-    
-    handles = driver.window_handles
-    driver.switch_to.window(handles[bizInfoListPopupHandleIndex]) 
-                                                
-    src = driver.find_element_by_name("hidden_frame").get_attribute("src")
-
-    
-    driver.get(src)         
-    soup_html = bs(driver.page_source, 'html.parser')
-
-except TimeoutException:
-    print("Timeout")
-    continue
-
-except NoSuchElementException:
-    print("No duplicate order detected")
-    continue
-
-except NoAlertPresentException:
-    print("No Alert Present")
-    continue
-
-except AttributeError:
-    print("AttributeError Present")
-    continue
-    
-except UnexpectedAlertPresentException:
-    alert = driver.switch_to_alert()
-    alert.accept()
-    print("Unexpected alert, yo!") 
-    continue
-"""
+driver.close()
