@@ -86,12 +86,21 @@ ele.click()
 time.sleep(2)
 
 # a 태그들 중 'aria-label' 속성값이 비밀번호랑 일치하는 것을 찾아 클릭
+"""
 numPadEles = driver.find_elements_by_tag_name("a")
 for i in range(len(student["secNum"])):
     for j in range(len(numPadEles)):
         if student["secNum"][i] == numPadEles[j].get_attribute("aria-label"):
             numPadEles[j].click()            
             time.sleep(0.5)
+"""
+
+for i in range(len(student["secNum"])):
+    secNum = student['secNum'][i]
+    numPadEle = driver.find_element_by_css_selector(f"a[aria-label='{secNum}']")
+    numPadEle.click()
+    time.sleep(0.5)
+                      
 ele =  driver.find_element_by_id('btnConfirm')
 ele.click()
 time.sleep(2)
