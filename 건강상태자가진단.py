@@ -8,7 +8,15 @@ import time
 ###############################################################
 
 #student = {'school' : '늘봄초', 'name' : '하지훈', 'sinNum' : '111117', 'secNum' : '8080'}
-student = {'school' : '늘봄초', 'name' : 'pull', 'sinNum' : '111117', 'secNum' : '8080'}
+student = {'school' : '늘봄초', 'name' : 'push0', 'sinNum' : '111117', 'secNum' : '8080'}
+student = {'school' : '늘봄초', 'name' : 'push1', 'sinNum' : '111117', 'secNum' : '8080'}
+student = {'school' : '늘봄초', 'name' : 'push2', 'sinNum' : '111117', 'secNum' : '8080'}
+
+
+student = {'school' : '늘봄초', 'name' : 'push', 'sinNum' : '111117', 'secNum' : '8080'}
+student = {'school' : '늘봄초', 'name' : 'push', 'sinNum' : '111117', 'secNum' : '8080'}
+
+student = {'school' : '늘봄초', 'name' : 'push', 'sinNum' : '111117', 'secNum' : '8080'}
 
 # webdriver 옵션 설정 : 화면 최대사이즈, 자동제어 메시지 나타나지 않게 설정
 opt = Options()
